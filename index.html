@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ARCADIA Hub | Galeria de Jogos</title>
+  <title>ARCADIA Hub | Galeria de Jogos com IA</title>
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     body {
@@ -12,58 +14,147 @@
       color: #e2e8f0;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
+    
+    /* Smooth card hover effects and neon glow */
     .card-glow {
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .card-glow:hover {
       transform: translateY(-6px);
       box-shadow: 0 12px 30px -5px rgba(168, 85, 247, 0.35);
+      border-color: rgba(168, 85, 247, 0.5);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f17;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* Pulse animation for active highlights */
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .animate-pulse-subtle {
+      animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
   </style>
 </head>
-<body class="min-h-screen pb-16 flex flex-col justify-between">
+<body class="min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
 
   <div>
-    <!-- Cabeçalho Principal -->
-    <header class="text-center py-12 px-4 border-b border-gray-800/80 bg-gradient-to-b from-purple-950/30 via-purple-900/10 to-transparent">
-      <div class="inline-flex items-center gap-2 px-3 py-1 bg-purple-500/10 text-purple-400 rounded-full text-xs font-semibold mb-4 border border-purple-500/20">
-        <i class="fas fa-gamepad text-sm"></i> Mostra de Projetos de IA
-      </div>
-
-      <!-- Nome com destaque em IA -->
-      <h1 class="text-4xl md:text-6xl font-black text-white tracking-tight">
-        ARCAD<span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">IA</span> <span class="text-gray-400 font-light">Hub</span>
-      </h1>
+    <!-- Top Bar Navigation / Header -->
+    <header class="relative border-b border-gray-800/80 bg-gradient-to-b from-purple-950/40 via-purple-900/10 to-transparent pt-10 pb-12 px-4 sm:px-6">
       
-      <p class="mt-3 text-gray-400 max-w-2xl mx-auto text-sm md:text-base">
-        Explore a galeria com os 16 jogos criados pelos alunos. Clique nos cards para jogar e testar cada uma das criações!
-      </p>
+      <!-- Background Ambient Glow -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-4xl h-48 bg-purple-600/10 blur-[100px] pointer-events-none rounded-full"></div>
 
-      <!-- Barra de Pesquisa e Botão Aleatório -->
-      <div class="mt-8 max-w-2xl mx-auto flex flex-col sm:flex-row gap-3 px-4">
-        <div class="relative flex-1">
-          <i class="fas fa-search absolute left-4 top-3.5 text-gray-500"></i>
-          <input type="text" id="searchInput" placeholder="Buscar por nome do jogo ou autor..." 
-                 class="w-full pl-11 pr-4 py-3 bg-gray-900/90 border border-gray-700/80 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition shadow-inner text-sm">
+      <div class="max-w-6xl mx-auto text-center relative z-10">
+        
+        <!-- Tag / Badge -->
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-purple-500/10 text-purple-300 rounded-full text-xs font-semibold mb-4 border border-purple-500/20 backdrop-blur-md">
+          <i class="fas fa-microchip text-purple-400 animate-pulse-subtle"></i>
+          <span>Mostra de Projetos de IA & Jogos</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+          <span class="text-purple-200">Turma 2026</span>
         </div>
-        <button onclick="playRandomGame()" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold rounded-xl transition flex items-center justify-center gap-2 shadow-lg text-sm shrink-0 active:scale-95">
-          <i class="fas fa-dice text-base"></i> Jogo Aleatório
-        </button>
+
+        <!-- Main Title -->
+        <h1 class="text-4xl sm:text-6xl font-black text-white tracking-tight leading-none mb-3">
+          ARCAD<span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">IA</span> 
+          <span class="text-gray-300 font-light">Hub</span>
+        </h1>
+        
+        <!-- Subtitle -->
+        <p class="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
+          Central interativa com os <span class="text-purple-300 font-semibold" id="totalGamesBadge">18 jogos</span> desenvolvidos pela turma. Escolha um projeto abaixo para testar diretamente no navegador!
+        </p>
+
+        <!-- Dynamic Counter Stats Bar -->
+        <div class="mt-6 flex flex-wrap justify-center items-center gap-4 text-xs text-gray-400">
+          <div class="px-3 py-1.5 rounded-lg bg-gray-900/80 border border-gray-800 flex items-center gap-2">
+            <i class="fas fa-gamepad text-purple-400"></i>
+            <span>Total: <strong class="text-white">18 Projetos</strong></span>
+          </div>
+          <div class="px-3 py-1.5 rounded-lg bg-gray-900/80 border border-gray-800 flex items-center gap-2">
+            <i class="fas fa-heart text-pink-500"></i>
+            <span>Curtidas Globais: <strong class="text-white" id="totalLikesCount">0</strong></span>
+          </div>
+          <div class="px-3 py-1.5 rounded-lg bg-gray-900/80 border border-gray-800 flex items-center gap-2">
+            <i class="fas fa-code text-indigo-400"></i>
+            <span>Hospedagens: <strong class="text-white">GitHub, Vercel, Render</strong></span>
+          </div>
+        </div>
+
+        <!-- Search Bar and Action Controls -->
+        <div class="mt-8 max-w-2xl mx-auto flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <i class="fas fa-search absolute left-4 top-3.5 text-gray-500 text-sm"></i>
+            <input type="text" id="searchInput" placeholder="Buscar por nome do jogo, autor ou tecnologia..." 
+                   class="w-full pl-11 pr-10 py-3 bg-gray-900/90 border border-gray-700/80 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition shadow-inner text-sm">
+            <button id="clearSearch" onclick="clearSearchInput()" class="hidden absolute right-3 top-3 text-gray-500 hover:text-gray-300 p-1 text-xs">
+              <i class="fas fa-times-circle"></i>
+            </button>
+          </div>
+
+          <button onclick="playRandomGame()" class="px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-purple-900/20 text-sm shrink-0 active:scale-95 group">
+            <i class="fas fa-dice text-base group-hover:rotate-180 transition-transform duration-500"></i> 
+            <span>Jogo Aleatório</span>
+          </button>
+        </div>
+
+        <!-- Filter Tags -->
+        <div class="mt-5 flex flex-wrap justify-center gap-2 text-xs">
+          <button onclick="filterByTag('all')" class="filter-btn active px-3 py-1 rounded-lg bg-purple-600 text-white font-medium transition" data-tag="all">Todos (18)</button>
+          <button onclick="filterByTag('github')" class="filter-btn px-3 py-1 rounded-lg bg-gray-900 border border-gray-800 text-gray-400 hover:text-white transition" data-tag="github"><i class="fab fa-github mr-1"></i>GitHub Pages</button>
+          <button onclick="filterByTag('vercel')" class="filter-btn px-3 py-1 rounded-lg bg-gray-900 border border-gray-800 text-gray-400 hover:text-white transition" data-tag="vercel">Vercel & Render</button>
+          <button onclick="filterByTag('ia')" class="filter-btn px-3 py-1 rounded-lg bg-gray-900 border border-gray-800 text-gray-400 hover:text-white transition" data-tag="ia"><i class="fas fa-robot mr-1"></i>Projetos de IA</button>
+        </div>
+
       </div>
     </header>
 
-    <!-- Grid de Jogos Cadastrados -->
-    <main class="max-w-7xl mx-auto px-4 mt-10">
-      <div id="gamesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+    <!-- Main Content Area: Grid of Games -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 my-10">
+      
+      <!-- Notification Banner / Toast Container -->
+      <div id="toast" class="fixed bottom-6 right-6 z-50 bg-purple-900/90 border border-purple-500 text-white px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fas fa-sparkles text-amber-300" id="toastIcon"></i>
+        <span id="toastMessage" class="text-xs font-medium">Notificação</span>
+      </div>
+
+      <!-- Games Grid -->
+      <div id="gamesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Rendered dynamically via JavaScript -->
+      </div>
     </main>
   </div>
 
-  <!-- Rodapé -->
-  <footer class="mt-16 text-center text-xs text-gray-600 border-t border-gray-800/60 pt-6">
-    <p>ARCADIA Hub • Plataforma de Jogos da Turma</p>
+  <!-- Footer -->
+  <footer class="mt-16 text-center text-xs text-gray-500 border-t border-gray-800/80 py-8 px-4 bg-gray-950/50">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-gray-300">ARCADIA Hub</span>
+        <span>•</span>
+        <span>Galeria Digital de Projetos</span>
+      </div>
+      <p class="text-gray-600">Desenvolvido para exibição de trabalhos e testes em sala de aula.</p>
+    </div>
   </footer>
 
+  <!-- Application Logic -->
   <script>
+    // Full Array of 18 Student Games
     const games = [
       {
         id: 1,
@@ -73,7 +164,8 @@
         icon: "fa-gamepad",
         gradient: "from-purple-600 to-indigo-600",
         url: "https://livia-singer08.github.io/jogo_com_IA/",
-        likes: 0
+        platform: "github",
+        isIa: true
       },
       {
         id: 2,
@@ -83,7 +175,8 @@
         icon: "fa-user-secret",
         gradient: "from-red-600 to-amber-700",
         url: "https://dossie-criminal-arquivos-confidenciais.ai.studio/",
-        likes: 0
+        platform: "aistudio",
+        isIa: true
       },
       {
         id: 3,
@@ -93,7 +186,8 @@
         icon: "fa-ghost",
         gradient: "from-pink-600 to-purple-800",
         url: "https://casa-das-inquietas.vercel.app/",
-        likes: 0
+        platform: "vercel",
+        isIa: false
       },
       {
         id: 4,
@@ -103,7 +197,8 @@
         icon: "fa-jedi",
         gradient: "from-blue-600 to-cyan-500",
         url: "https://starwars-galactic-duel.vercel.app/",
-        likes: 0
+        platform: "vercel",
+        isIa: false
       },
       {
         id: 5,
@@ -113,7 +208,8 @@
         icon: "fa-bug",
         gradient: "from-emerald-600 to-teal-700",
         url: "https://carloshalb.github.io/BugHunter3D/",
-        likes: 0
+        platform: "github",
+        isIa: false
       },
       {
         id: 6,
@@ -123,7 +219,8 @@
         icon: "fa-brain",
         gradient: "from-violet-600 to-fuchsia-700",
         url: "https://github.com/mathias625/VivaASuaMenteGame",
-        likes: 0
+        platform: "github",
+        isIa: false
       },
       {
         id: 7,
@@ -133,7 +230,8 @@
         icon: "fa-moon",
         gradient: "from-indigo-700 to-purple-900",
         url: "https://leticiadoffsottasouza.github.io/Moon_Valley/",
-        likes: 0
+        platform: "github",
+        isIa: false
       },
       {
         id: 8,
@@ -143,7 +241,8 @@
         icon: "fa-robot",
         gradient: "from-cyan-600 to-blue-800",
         url: "https://github.com/kauaazxx/Jogo-IA",
-        likes: 0
+        platform: "github",
+        isIa: true
       },
       {
         id: 9,
@@ -153,7 +252,8 @@
         icon: "fa-gamepad",
         gradient: "from-red-600 to-yellow-500",
         url: "https://bruno18157.github.io/super-senai-bros/",
-        likes: 0
+        platform: "github",
+        isIa: false
       },
       {
         id: 10,
@@ -163,7 +263,8 @@
         icon: "fa-diamond",
         gradient: "from-emerald-700 to-amber-600",
         url: "https://bruno18157.github.io/Truco-Web-/",
-        likes: 0
+        platform: "github",
+        isIa: false
       },
       {
         id: 11,
@@ -173,7 +274,8 @@
         icon: "fa-laptop-code",
         gradient: "from-blue-600 to-purple-700",
         url: "https://leandrosaltorato.github.io/game_ia/",
-        likes: 0
+        platform: "github",
+        isIa: true
       },
       {
         id: 12,
@@ -183,7 +285,8 @@
         icon: "fa-futbol",
         gradient: "from-green-600 to-teal-800",
         url: "https://julianopls.github.io/FUT-IA/",
-        likes: 0
+        platform: "github",
+        isIa: true
       },
       {
         id: 13,
@@ -193,7 +296,8 @@
         icon: "fa-clone",
         gradient: "from-purple-700 to-pink-600",
         url: "https://genshintcg.vercel.app/",
-        likes: 0
+        platform: "vercel",
+        isIa: false
       },
       {
         id: 14,
@@ -203,7 +307,8 @@
         icon: "fa-cookie-bite",
         gradient: "from-pink-500 to-rose-600",
         url: "https://doce-fabrica.vercel.app/",
-        likes: 0
+        platform: "vercel",
+        isIa: false
       },
       {
         id: 15,
@@ -213,7 +318,8 @@
         icon: "fa-graduation-cap",
         gradient: "from-blue-700 to-indigo-900",
         url: "https://jogo-sesi3.vercel.app/",
-        likes: 0
+        platform: "vercel",
+        isIa: false
       },
       {
         id: 16,
@@ -223,75 +329,239 @@
         icon: "fa-fist-raised",
         gradient: "from-red-700 to-orange-600",
         url: "https://recrocs.github.io/Sesi-Kombat/Engine/index.html",
-        likes: 0
+        platform: "github",
+        isIa: false
+      },
+      {
+        id: 17,
+        title: "Pokémon Battle Arena",
+        student: "Projeto Render",
+        description: "Arena de batalhas no estilo Pokémon desenvolvida e hospedada na plataforma Render.",
+        icon: "fa-dragon",
+        gradient: "from-amber-500 to-red-600",
+        url: "https://pokemon-battle-arena-f557.onrender.com/",
+        platform: "vercel",
+        isIa: false
+      },
+      {
+        id: 18,
+        title: "Jogo do Nick",
+        student: "nickfelisbelo",
+        description: "Projeto de jogo interativo desenvolvido e hospedado no GitHub Pages.",
+        icon: "fa-crosshairs",
+        gradient: "from-indigo-600 to-cyan-600",
+        url: "https://nickfelisbelo.github.io/Jogo/",
+        platform: "github",
+        isIa: false
       }
     ];
 
+    // State Management for Likes (using LocalStorage for persistence)
+    let userLikes = JSON.parse(localStorage.getItem('arcadia_hub_likes')) || {};
+
+    // Filter state
+    let activeTagFilter = 'all';
+
+    // Initialize Page
+    function init() {
+      renderGames(games);
+      updateTotalLikes();
+    }
+
+    // Render Game Cards
     function renderGames(items) {
       const grid = document.getElementById('gamesGrid');
+      
       if (items.length === 0) {
-        grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">Nenhum jogo encontrado com esse termo.</div>`;
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-16 px-4 bg-gray-900/40 rounded-2xl border border-gray-800/80">
+            <i class="fas fa-ghost text-4xl text-gray-600 mb-3 block"></i>
+            <h3 class="text-lg font-semibold text-gray-300">Nenhum jogo encontrado</h3>
+            <p class="text-sm text-gray-500 mt-1">Tente buscar por outro termo ou limpe os filtros de pesquisa.</p>
+            <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-purple-600/20 text-purple-300 hover:bg-purple-600/30 rounded-lg text-xs font-semibold border border-purple-500/30 transition">
+              Limpar Filtros
+            </button>
+          </div>
+        `;
         return;
       }
 
-      grid.innerHTML = items.map(game => `
-        <div class="bg-gray-900/80 border border-gray-800 rounded-2xl overflow-hidden card-glow flex flex-col justify-between">
-          <div>
-            <div class="h-36 bg-gradient-to-br ${game.gradient} flex items-center justify-center relative overflow-hidden">
-              <i class="fas ${game.icon} text-6xl text-white/20 absolute -bottom-2 -right-2 transform rotate-12"></i>
-              <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-2xl shadow-lg">
-                <i class="fas ${game.icon}"></i>
+      grid.innerHTML = items.map(game => {
+        const likesCount = userLikes[game.id] || 0;
+        const isLiked = likesCount > 0;
+
+        return `
+          <div class="bg-gray-900/80 border border-gray-800/90 rounded-2xl overflow-hidden card-glow flex flex-col justify-between backdrop-blur-sm group">
+            <div>
+              <!-- Card Header / Gradient Banner -->
+              <div class="h-36 bg-gradient-to-br ${game.gradient} flex items-center justify-center relative overflow-hidden">
+                <!-- Decorative background icon -->
+                <i class="fas ${game.icon} text-7xl text-white/10 absolute -bottom-3 -right-2 transform rotate-12 group-hover:scale-110 transition-transform duration-300"></i>
+                
+                <!-- Main Badge Icon -->
+                <div class="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white text-2xl shadow-xl group-hover:scale-105 transition-transform duration-300">
+                  <i class="fas ${game.icon}"></i>
+                </div>
+
+                ${game.isIa ? `
+                  <span class="absolute top-3 right-3 px-2.5 py-0.5 bg-black/40 backdrop-blur-md border border-white/20 text-purple-200 text-[10px] font-bold rounded-full flex items-center gap-1">
+                    <i class="fas fa-sparkles text-amber-300 text-[9px]"></i> IA
+                  </span>
+                ` : ''}
+              </div>
+
+              <!-- Card Body Content -->
+              <div class="p-5">
+                <h3 class="text-lg font-bold text-white leading-snug group-hover:text-purple-300 transition-colors">${game.title}</h3>
+                
+                <div class="flex items-center gap-1.5 mt-1 mb-3 text-xs">
+                  <i class="fas fa-user-circle text-purple-400"></i>
+                  <span class="text-gray-400">Autor(a):</span>
+                  <span class="text-purple-300 font-medium truncate">${game.student}</span>
+                </div>
+
+                <p class="text-gray-400 text-xs leading-relaxed line-clamp-3">${game.description}</p>
               </div>
             </div>
 
-            <div class="p-5">
-              <h3 class="text-xl font-bold text-white leading-snug">${game.title}</h3>
-              <p class="text-xs font-medium text-purple-400 mt-1 mb-3">
-                <i class="fas fa-user-circle mr-1"></i> Autor(a): <span class="text-purple-300 font-semibold">${game.student}</span>
-              </p>
-              <p class="text-gray-400 text-xs leading-relaxed line-clamp-3">${game.description}</p>
+            <!-- Card Action Footer -->
+            <div class="px-5 pb-5 pt-3 border-t border-gray-800/60 flex items-center justify-between gap-3 mt-auto">
+              <button onclick="toggleLike(${game.id})" 
+                      class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition active:scale-90 ${isLiked ? 'bg-pink-500/20 text-pink-400 border border-pink-500/30' : 'bg-gray-800/50 text-gray-400 hover:text-pink-400 border border-gray-700/50'}">
+                <i class="${isLiked ? 'fas' : 'far'} fa-heart text-pink-500"></i>
+                <span id="like-${game.id}">${likesCount}</span>
+              </button>
+
+              <a href="${game.url}" target="_blank" rel="noopener noreferrer" 
+                 class="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white text-xs font-semibold rounded-xl transition flex items-center gap-2 shadow-md shadow-purple-900/30">
+                <span>Acessar / Jogar</span>
+                <i class="fas fa-external-link-alt text-[10px]"></i>
+              </a>
             </div>
           </div>
-
-          <div class="px-5 pb-5 pt-3 border-t border-gray-800/60 flex items-center justify-between gap-3 mt-auto">
-            <button onclick="toggleLike(${game.id})" class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-pink-400 transition">
-              <i class="far fa-heart text-pink-500"></i> <span id="like-${game.id}">${game.likes}</span>
-            </button>
-
-            <a href="${game.url}" target="_blank" rel="noopener noreferrer" 
-               class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg transition flex items-center gap-2 shadow">
-              Acessar / Jogar <i class="fas fa-external-link-alt text-[10px]"></i>
-            </a>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
-    function applySearch() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = games.filter(g => 
-        g.title.toLowerCase().includes(query) || 
-        g.student.toLowerCase().includes(query) ||
-        g.description.toLowerCase().includes(query)
-      );
+    // Toggle Like Action with LocalStorage saving
+    function toggleLike(id) {
+      if (!userLikes[id]) {
+        userLikes[id] = 1;
+        showToast("Jogo adicionado aos seus favoritos!", "fa-heart text-pink-400");
+      } else {
+        userLikes[id] += 1;
+        showToast("Mais um voto para este jogo!", "fa-fire text-amber-400");
+      }
+      
+      localStorage.setItem('arcadia_hub_likes', JSON.stringify(userLikes));
+      
+      const likeElement = document.getElementById(`like-${id}`);
+      if (likeElement) {
+        likeElement.innerText = userLikes[id];
+      }
+      
+      updateTotalLikes();
+      // Re-render to update heart icon style
+      applySearchAndFilter();
+    }
+
+    // Update global likes counter header
+    function updateTotalLikes() {
+      const total = Object.values(userLikes).reduce((acc, curr) => acc + curr, 0);
+      document.getElementById('totalLikesCount').innerText = total;
+    }
+
+    // Combined Search and Filter Logic
+    function applySearchAndFilter() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const clearBtn = document.getElementById('clearSearch');
+
+      if (query.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      const filtered = games.filter(g => {
+        const matchesQuery = 
+          g.title.toLowerCase().includes(query) || 
+          g.student.toLowerCase().includes(query) ||
+          g.description.toLowerCase().includes(query);
+
+        let matchesTag = true;
+        if (activeTagFilter === 'github') matchesTag = g.platform === 'github';
+        if (activeTagFilter === 'vercel') matchesTag = (g.platform === 'vercel' || g.platform === 'aistudio');
+        if (activeTagFilter === 'ia') matchesTag = g.isIa;
+
+        return matchesQuery && matchesTag;
+      });
+
       renderGames(filtered);
     }
 
+    // Filter by category tag
+    function filterByTag(tag) {
+      activeTagFilter = tag;
+      
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        if (btn.dataset.tag === tag) {
+          btn.classList.add('bg-purple-600', 'text-white');
+          btn.classList.remove('bg-gray-900', 'text-gray-400');
+        } else {
+          btn.classList.remove('bg-purple-600', 'text-white');
+          btn.classList.add('bg-gray-900', 'text-gray-400');
+        }
+      });
+
+      applySearchAndFilter();
+    }
+
+    // Clear search input box
+    function clearSearchInput() {
+      document.getElementById('searchInput').value = '';
+      applySearchAndFilter();
+    }
+
+    // Reset all filters
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      filterByTag('all');
+    }
+
+    // Open a random game from the pool
     function playRandomGame() {
       const randomIndex = Math.floor(Math.random() * games.length);
-      window.open(games[randomIndex].url, '_blank');
+      const randomGame = games[randomIndex];
+      
+      showToast(`Abrindo "${randomGame.title}"...`, "fa-dice-d20 text-purple-300");
+      setTimeout(() => {
+        window.open(randomGame.url, '_blank');
+      }, 400);
     }
 
-    function toggleLike(id) {
-      const game = games.find(g => g.id === id);
-      if (game) {
-        game.likes += 1;
-        document.getElementById(`like-${id}`).innerText = game.likes;
-      }
+    // Toast Popup Helper
+    let toastTimeout;
+    function showToast(msg, iconClass = "fa-info-circle text-purple-300") {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+
+      toastMsg.innerText = msg;
+      toastIcon.className = `fas ${iconClass}`;
+
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3000);
     }
 
-    document.getElementById('searchInput').addEventListener('input', applySearch);
-    renderGames(games);
+    // Event Listeners
+    document.getElementById('searchInput').addEventListener('input', applySearchAndFilter);
+
+    // Boot App
+    init();
   </script>
 </body>
 </html>
